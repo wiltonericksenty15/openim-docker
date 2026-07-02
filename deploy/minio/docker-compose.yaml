@@ -1,0 +1,42 @@
+networks:
+  openim:
+    external: true
+    name: openim
+
+services:
+  minio:
+    image: "${MINIO_IMAGE}"
+    container_name: minio
+    init: true
+    ports:
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9090"
+    volumes:
+      - "${DATA_DIR}/data:/data"
+      - "${DATA_DIR}/config:/root/.minio"
+    env_file:
+      - ${DATA_DIR}/config/minio.env
+    environment:
+      TZ: Asia/Shanghai
+      MINIO_ROOT_USER: "${MINIO_ACCESS_KEY_ID}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_ACCESS_KEY}"
+    restart: always
+    mem_swappiness: 0
+    sysctls:
+      net.core.somaxconn: 65535
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+      nproc:
+        soft: 65535
+        hard: 65535
+    deploy:
+      resources:
+        limits:
+          memory: ${MINIO_MEMORY_LIMIT}
+        reservations:
+          memory: 256M
+    command: server /data --console-address ":9090" --address ":9000" --json
+    networks:
+      - openim

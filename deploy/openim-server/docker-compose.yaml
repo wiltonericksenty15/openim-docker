@@ -1,0 +1,50 @@
+networks:
+  openim:
+    external: true
+    name: openim
+
+services:
+  openim-server:
+    image: ${OPENIM_SERVER_IMAGE}
+    container_name: openim-server
+    init: true
+    ports:
+      - "${OPENIM_MSG_GATEWAY_PORT}:10001"
+      - "${OPENIM_API_PORT}:10002"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "mage check"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+      start_period: 60s
+    environment:
+      TZ: Asia/Shanghai
+      IMENV_MONGODB_ADDRESS: ${MONGO_ADDRESS}
+      IMENV_MONGODB_USERNAME: ${MONGO_USERNAME}
+      IMENV_MONGODB_PASSWORD: ${MONGO_PASSWORD}
+      IMENV_KAFKA_ADDRESS: ${KAFKA_ADDRESS}
+      IMENV_KAFKA_USERNAME: ${KAFKA_USERNAME:-}
+      IMENV_KAFKA_PASSWORD: ${KAFKA_PASSWORD:-}
+      IMENV_DISCOVERY_ETCD_ADDRESS: ${ETCD_ADDRESS}
+      IMENV_REDIS_ADDRESS: ${REDIS_ADDRESS}
+      IMENV_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      IMENV_DISCOVERY_ETCD_USERNAME: ${ETCD_USERNAME:-}
+      IMENV_DISCOVERY_ETCD_PASSWORD: ${ETCD_PASSWORD:-}
+      IMENV_MINIO_INTERNALADDRESS: ${MINIO_INTERNAL_ADDRESS}
+      IMENV_MINIO_EXTERNALADDRESS: ${MINIO_EXTERNAL_ADDRESS}
+      IMENV_MINIO_ACCESSKEYID: ${MINIO_ACCESS_KEY_ID}
+      IMENV_MINIO_SECRETACCESSKEY: ${MINIO_SECRET_ACCESS_KEY}
+      IMENV_SHARE_SECRET: ${OPENIM_SECRET}
+      IMENV_LOG_ISSTDOUT: ${LOG_IS_STDOUT}
+      IMENV_LOG_REMAINLOGLEVEL: ${LOG_LEVEL}
+      IMENV_OPENIM_API_PROMETHEUS_GRAFANAURL: ${GRAFANA_URL}
+    restart: always
+    mem_swappiness: 0
+    deploy:
+      resources:
+        limits:
+          memory: ${OPENIM_SERVER_MEMORY_LIMIT}
+        reservations:
+          memory: 512M
+    networks:
+      - openim

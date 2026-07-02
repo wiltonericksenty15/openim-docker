@@ -1,0 +1,4 @@
+networks:
+  openim:
+    name: openim
+    driver: bridge
