@@ -7,7 +7,6 @@ services:
   node-exporter:
     image: ${NODE_EXPORTER_IMAGE}
     container_name: node-exporter
-    init: true
     restart: always
     ports:
       - "${NODE_EXPORTER_PORT}:9100"
@@ -22,6 +21,5 @@ services:
       - "--path.sysfs=/host/sys"
       - "--path.rootfs=/rootfs"
       - "--web.listen-address=:9100"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     networks:
       - openim

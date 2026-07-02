@@ -7,7 +7,6 @@ services:
   openim-admin-front:
     image: ${OPENIM_ADMIN_FRONT_IMAGE}
     container_name: openim-admin-front
-    init: true
     restart: always
     ports:
       - "${OPENIM_ADMIN_FRONT_PORT}:80"

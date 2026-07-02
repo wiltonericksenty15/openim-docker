@@ -7,7 +7,6 @@ services:
   openim-web-front:
     image: ${OPENIM_WEB_FRONT_IMAGE}
     container_name: openim-web-front
-    init: true
     restart: always
     ports:
       - "${OPENIM_WEB_FRONT_PORT}:80"

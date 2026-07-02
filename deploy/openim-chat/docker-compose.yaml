@@ -7,16 +7,9 @@ services:
   openim-chat:
     image: ${OPENIM_CHAT_IMAGE}
     container_name: openim-chat
-    init: true
     ports:
       - "${CHAT_API_PORT}:10008"
       - "${ADMIN_API_PORT}:10009"
-    healthcheck:
-      test: ["CMD", "sh", "-c", "mage check"]
-      interval: 5s
-      timeout: 60s
-      retries: 10
-      start_period: 60s
     environment:
       TZ: Asia/Shanghai
       CHATENV_MONGODB_ADDRESS: ${MONGO_ADDRESS}
@@ -26,18 +19,9 @@ services:
       CHATENV_REDIS_ADDRESS: ${REDIS_ADDRESS}
       CHATENV_REDIS_PASSWORD: ${REDIS_PASSWORD}
       CHATENV_SHARE_OPENIM_SECRET: ${OPENIM_SECRET}
-      CHATENV_DISCOVERY_ETCD_USERNAME: ${ETCD_USERNAME:-}
-      CHATENV_DISCOVERY_ETCD_PASSWORD: ${ETCD_PASSWORD:-}
       CHATENV_SHARE_OPENIM_APIURL: ${API_URL}
       CHATENV_LOG_ISSTDOUT: ${LOG_IS_STDOUT}
       CHATENV_LOG_REMAINLOGLEVEL: ${LOG_LEVEL}
     restart: always
-    mem_swappiness: 0
-    deploy:
-      resources:
-        limits:
-          memory: ${OPENIM_CHAT_MEMORY_LIMIT}
-        reservations:
-          memory: 256M
     networks:
       - openim

@@ -7,53 +7,23 @@ services:
   etcd:
     image: "${ETCD_IMAGE}"
     container_name: etcd
-    init: true
-    restart: always
     ports:
       - "${ETCD_CLIENT_PORT}:2379"
       - "${ETCD_PEER_PORT}:2380"
     volumes:
       - "${DATA_DIR}/data:/etcd-data"
-      - "${DATA_DIR}/scripts/init-auth.sh:/opt/etcd/init-auth.sh:ro"
-    env_file:
-      - ${DATA_DIR}/config/etcd.env
     environment:
       TZ: Asia/Shanghai
-      ETCD_ROOT_USER: ${ETCD_ROOT_USER:-}
-      ETCD_ROOT_PASSWORD: ${ETCD_ROOT_PASSWORD:-}
-      ETCD_USERNAME: ${ETCD_USERNAME:-}
-      ETCD_PASSWORD: ${ETCD_PASSWORD:-}
-    mem_swappiness: 0
-    sysctls:
-      net.core.somaxconn: 65535
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535
-      nproc:
-        soft: 65535
-        hard: 65535
-    deploy:
-      resources:
-        limits:
-          memory: ${ETCD_MEMORY_LIMIT}
-        reservations:
-          memory: 256M
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "etcdctl --endpoints=http://127.0.0.1:2379 endpoint health >/dev/null 2>&1 || exit 1",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    command: >
-      /bin/sh -c '
-        etcd &
-        /bin/sh /opt/etcd/init-auth.sh
-        tail -f /dev/null
-      '
+      ETCD_NAME: s1
+      ETCD_DATA_DIR: /etcd-data
+      ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      ETCD_ADVERTISE_CLIENT_URLS: http://etcd:2379
+      ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://etcd:2380
+      ETCD_INITIAL_CLUSTER: s1=http://etcd:2380
+      ETCD_INITIAL_CLUSTER_TOKEN: tkn
+      ETCD_INITIAL_CLUSTER_STATE: new
+      ALLOW_NONE_AUTHENTICATION: "no"
+    restart: always
     networks:
       - openim

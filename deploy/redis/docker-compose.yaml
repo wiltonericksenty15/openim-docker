@@ -7,43 +7,20 @@ services:
   redis:
     image: "${REDIS_IMAGE}"
     container_name: redis
-    init: true
     ports:
       - "${REDIS_PORT}:6379"
     volumes:
       - "${DATA_DIR}/data:/data"
-      - "${DATA_DIR}/config/redis.conf:/usr/local/redis/config/redis.conf"
     environment:
       TZ: Asia/Shanghai
     restart: always
-    mem_swappiness: 0
-    sysctls:
-      net.core.somaxconn: 65535
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535
-      nproc:
-        soft: 65535
-        hard: 65535
-    deploy:
-      resources:
-        limits:
-          memory: ${REDIS_MEMORY_LIMIT}
-        reservations:
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     command:
       [
         "redis-server",
-        "/usr/local/redis/config/redis.conf",
         "--requirepass",
         "${REDIS_PASSWORD}",
+        "--appendonly",
+        "yes",
       ]
     networks:
       - openim

@@ -7,7 +7,6 @@ services:
   alertmanager:
     image: ${ALERTMANAGER_IMAGE}
     container_name: alertmanager
-    init: true
     restart: always
     ports:
       - "${ALERTMANAGER_PORT}:9093"
@@ -16,19 +15,6 @@ services:
       - "${DATA_DIR}/config/email.tmpl:/etc/alertmanager/email.tmpl"
     environment:
       TZ: Asia/Shanghai
-    mem_swappiness: 0
-    deploy:
-      resources:
-        limits:
-          memory: ${ALERTMANAGER_MEMORY_LIMIT}
-        reservations:
-          memory: 64M
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9093/-/healthy"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--web.listen-address=:9093"

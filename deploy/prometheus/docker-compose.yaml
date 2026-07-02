@@ -7,7 +7,6 @@ services:
   prometheus:
     image: ${PROMETHEUS_IMAGE}
     container_name: prometheus
-    init: true
     restart: always
     user: root
     ports:
@@ -18,25 +17,9 @@ services:
       - "${DATA_DIR}/data:/prometheus"
     environment:
       TZ: Asia/Shanghai
-    mem_swappiness: 0
-    deploy:
-      resources:
-        limits:
-          memory: ${PROMETHEUS_MEMORY_LIMIT}
-        reservations:
-          memory: 256M
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}"
-      - "--storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE}"
       - "--web.listen-address=:9090"
-      - "--web.enable-lifecycle"
     networks:
       - openim
