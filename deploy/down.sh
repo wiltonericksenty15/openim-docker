@@ -7,8 +7,19 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${SCRIPT_DIR}/.env"
 
+remove_network() {
+  if docker network inspect openim >/dev/null 2>&1; then
+    echo ">>> Removing network openim..."
+    docker network rm openim
+  fi
+}
+
 compose_down() {
   local service=$1
+  if [ "${service}" = "network" ]; then
+    remove_network
+    return
+  fi
   echo ">>> Stopping ${service}..."
   docker compose --env-file "${ENV_FILE}" -f "${SCRIPT_DIR}/${service}/docker-compose.yaml" down
 }

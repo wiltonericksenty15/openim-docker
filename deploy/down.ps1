@@ -10,8 +10,20 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvFile = Join-Path $ScriptDir ".env"
 
+function Remove-Network {
+    docker network inspect openim 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ">>> Removing network openim..."
+        docker network rm openim
+    }
+}
+
 function Invoke-ComposeDown {
     param([string]$Service)
+    if ($Service -eq "network") {
+        Remove-Network
+        return
+    }
     Write-Host ">>> Stopping $Service..."
     docker compose --env-file $EnvFile -f (Join-Path $ScriptDir "$Service/docker-compose.yaml") down
 }

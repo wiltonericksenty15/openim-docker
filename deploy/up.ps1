@@ -13,8 +13,21 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvFile = Join-Path $ScriptDir ".env"
 
+function Ensure-Network {
+    docker network inspect openim 2>$null | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host ">>> Creating network openim..."
+        docker network create openim
+    }
+}
+
 function Invoke-ComposeUp {
     param([string]$Service)
+    if ($Service -eq "network") {
+        Ensure-Network
+        return
+    }
+    Ensure-Network
     Write-Host ">>> Starting $Service..."
     docker compose --env-file $EnvFile -f (Join-Path $ScriptDir "$Service/docker-compose.yaml") up -d
 }

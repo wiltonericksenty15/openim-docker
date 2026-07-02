@@ -10,8 +10,20 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${SCRIPT_DIR}/.env"
 
+ensure_network() {
+  if ! docker network inspect openim >/dev/null 2>&1; then
+    echo ">>> Creating network openim..."
+    docker network create openim
+  fi
+}
+
 compose_up() {
   local service=$1
+  if [ "${service}" = "network" ]; then
+    ensure_network
+    return
+  fi
+  ensure_network
   echo ">>> Starting ${service}..."
   docker compose --env-file "${ENV_FILE}" -f "${SCRIPT_DIR}/${service}/docker-compose.yaml" up -d
 }
