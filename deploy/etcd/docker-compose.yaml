@@ -23,7 +23,7 @@ services:
       ETCD_INITIAL_CLUSTER: s1=http://etcd:2380
       ETCD_INITIAL_CLUSTER_TOKEN: tkn
       ETCD_INITIAL_CLUSTER_STATE: new
-      ALLOW_NONE_AUTHENTICATION: "no"
+      ALLOW_NONE_AUTHENTICATION: "yes"
     restart: always
     networks:
       - openim
